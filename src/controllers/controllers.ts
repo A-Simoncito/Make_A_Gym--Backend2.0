@@ -25,7 +25,7 @@ export const register = (req: Request, res: Response) => {
   const user = new Users(email, password);
 
   users.push(user);
-  res.status(201).json({
+  return res.status(201).json({
     msg: "Usuario creado",
     user,
   });

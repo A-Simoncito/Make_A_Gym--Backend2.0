@@ -1,6 +1,10 @@
-import { Server } from "./server/server";
+// import { Server } from "./server/server";
+// import "./db/db"
 
-const server = new Server()
-server.init()
 
-console.log ("Servidor andando")
+
+
+// const server = new Server()
+// server.init()
+
+// console.log ("Servidor andando")
