@@ -1,119 +1,44 @@
+//LOGIN
+
 import { Request, Response } from "express";
-import { Users } from "../models/users";
+import  Users  from "../models/users";
+import { AppDataSource } from "../db/db";
 
-const users: Users[] = [];
 
-export const register = (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  if (email == null || password == null) {
-    return res.status(400).json({
-      msg: "El email y la contraseña son obligatorios",
-    });
+export const login = async (req:Request, res: Response) => {
+  const {email, password} = req.body
+  try{
+      const comparador = await AppDataSource.manager.findOne(Users, {where:{email, password}})
+      if (comparador) {res.json({mensaje: "Secion iniciada"})}
+      else {res.status(400).json({mensaje: "Secion Fallida"})}
   }
-  let existUser = false;
-  users.forEach((e) => {
-    if (email == e.email) {
-      existUser = true;
-      return;
-    }
-  });
-  if (existUser) {
-    return res.status(400).json({
-      msg: `email ${email} ya en uso`,
-    });
+  catch(error){
+      console.log(error)
   }
-  const user = new Users(email, password);
+}
 
-  users.push(user);
-  return res.status(201).json({
-    msg: "Usuario creado",
-    user,
-  });
-};
+//REGISTER
+export const register = async (req:Request, res:Response) =>{
+  const {email,password} = req.body
+  console.log (req.body)
+  
+   
+  const comparador = await AppDataSource.manager.findOne(Users, {where:{email}})
+  if (comparador) {
+      return res.status(400).json({ error: 'El Usuario o Email ya esta en uso' });
+  } else {
 
-export const login = (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  if (email == null || password == null) {
-    return res.status(400).json({
-      msg: "El email y la contraseña son obligatorios",
-    });
+      const newUser = new Users(email, password);
+      try {
+          await AppDataSource.manager.save(newUser)
+          return res.status(200).json({mensaje: 'El usuario se guardo exitosamente'})
+          
+      } catch (error) {
+          console.log(error)
+
+          return res.status(400).json({mensaje:'ERROR, no se puso crear el usuario'})
+          
+      }
+     
   }
-  let user: Users | null = null;
-
-  for (const userInUsers of users) {
-    if (userInUsers.email == email) {
-      user = userInUsers;
-      break;
-    }
-  }
-
-  if (user == null)
-    return res.json({
-      msg: "Usuario no encontrado",
-    });
-
-  if (password != user.password) {
-    return res.status(400).json({
-      msg: "Contraseña incorrecta",
-    });
-  }
-
-  return res.json({
-    msg: "Sesion iniciada",
-    user,
-  });
-};
-
-export const getAllProducts = (_: Request, res: Response) => { //modificaciones productos
-  console.table(users);
-  const products = [
-    {
-      nombre: "Press de Banca",
-      precio: 900,
-      caracteristicas: "Maquina de pecho",
-    },
-    {
-      nombre: "Press inclinado",
-      precio: 950,
-      caracteristicas: "Maquina de Pecho",
-    },
-    {
-      nombre: "Press declinado",
-      precio: 750,
-      caracteristicas: "Maquina de Pecho",
-    },
-    {
-      nombre: "Prensa 45°",
-      precio: 1100,
-      caracteristicas: "Maquina de Piernas",
-    },
-    {
-      nombre: "Sillon cuadriceps",
-      precio: 400,
-      caracteristicas: "Maquina de Piernas",
-    },
-    {
-        nombre: "Gemelos",
-        precio: 420,
-        caracteristicas: "Maquina de Pierna",
-      },
-      {
-        nombre: "Dorsalera",
-        precio: 940,
-        caracteristicas: "Maquina de Espalda",
-      },
-      {
-        nombre: "Remo",
-        precio: 320,
-        caracteristicas: "Maquina de Espalda",
-      },
-      {
-        nombre: "Barra de Dominadas",
-        precio: 90,
-        caracteristicas: "Maquina de Espalda",
-      },
-  ];
-  res.json({
-    products,
-  });
-};
+}
