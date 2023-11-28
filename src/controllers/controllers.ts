@@ -3,6 +3,7 @@
 import { Request, Response } from "express";
 import  Users  from "../models/users";
 import { AppDataSource } from "../db/db";
+import Product from "../models/products"
 
 
 export const login = async (req:Request, res: Response) => {
@@ -41,4 +42,14 @@ export const register = async (req:Request, res:Response) =>{
       }
      
   }
+}
+
+//PRODUCTOS
+
+const productRepository = AppDataSource.getRepository(Product)
+export const getAllProducts = async (_: Request, res: Response) => {
+    const products = await productRepository.find()
+    res.json({
+        products
+    })
 }
