@@ -32,12 +32,12 @@ export const register = async (req:Request, res:Response) =>{
       const newUser = new Users(email, password);
       try {
           await AppDataSource.manager.save(newUser)
-          return res.status(200).json({mensaje: 'El usuario se guardo exitosamente'})
+          return res.status(200).json({mensaje: 'El usuario se registro exitosamente'})
           
       } catch (error) {
           console.log(error)
 
-          return res.status(400).json({mensaje:'ERROR, no se puso crear el usuario'})
+          return res.status(400).json({mensaje:'No se pudo registrar el usuario, ERROR'})
           
       }
      
